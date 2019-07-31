@@ -1,0 +1,594 @@
+# Swagger spec for Scholarsphere (see https://swagger.io/specification/)
+
+swagger: "2.0"
+info:
+  description: "API specification for Scholarsphere"
+  version: "1.0.0"
+  title: "Scholarsphere"
+  termsOfService: "https://scholarsphere.psu.edu/about"
+  contact:
+    name: "Scholarsphere Support"
+    email: "umg-up.its.scholarsphere-support@groups.ucs.psu.edu"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "api.scholarsphere.psu.edu"
+basePath: "/v1"
+schemes:
+  - "https"
+
+# Listing of the basic model concepts used in the application (see https://swagger.io/specification/#tagObject)
+tags:
+  - name: "work"
+    description: "Resource with descriptive and administrative metadata that contains files"
+    externalDocs:
+      description: "PCDM object"
+      url: "http://pcdm.org/models#Object"
+  - name: "fileset"
+    description: "Resource containing one original source file, and zero or more derivative files"
+    externalDocs:
+      description: "PCDM object"
+      url: "http://pcdm.org/models#Object"
+  - name: "file"
+    description: "Binary data and accompanying metadata"
+    externalDocs:
+      description: "PCDM file"
+      url: "http://pcdm.org/models#File"
+  - name: "agent"
+    description: "Person or organization that is identified as the creator or contributor to a work"
+  - name: "id"
+    description: "Alphanumeric string used as a unique identifier"
+
+# Paths Object, containing multiple Path Item Objects. Each path item will contain multiple Operation Objects.
+# See:
+#   https://swagger.io/specification/#pathsObject
+#   https://swagger.io/specification/#pathItemObject
+#   https://swagger.io/specification/#operationObject
+paths:
+  /works:
+    post:
+      summary: "Creates a new work"
+      operationId: "createWork"
+      consumes:
+        - "application/json"
+        - "application/xml"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Metadata for the resource"
+          required: true
+          schema:
+            $ref: "#/definitions/Work"
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Client error"
+        401:
+          description: "Unauthorized"
+        422:
+          description: "Failed"
+  /works/{id}:
+    get:
+      summary: "Displays a work"
+      operationId: "showWork"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Identifier of the resource"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "Success"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not found"
+    put:
+      summary: "Updates an existing work"
+      operationId: "updateWork"
+      consumes:
+        - "application/json"
+        - "application/xml"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Metadata for the resource"
+          required: true
+          schema:
+            $ref: "#/definitions/Work"
+        - in: "path"
+          name: "id"
+          description: "Identifier of the resource"
+          required: true
+          type: "string"
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Client error"
+        401:
+          description: "Unauthorized"
+        422:
+          description: "Failed"
+    delete:
+      summary: "Deletes a work"
+      operationId: "deleteWork"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Identifier of the resource"
+          required: true
+          type: "string"
+      responses:
+        204:
+          description: "Success"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not found"
+        422:
+          description: "Failed"
+  /filesets:
+    post:
+      summary: "Creates a new fileset"
+      operationId: "createFileSet"
+      consumes:
+        - "application/json"
+        - "application/xml"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Metadata for the fileset"
+          required: true
+          schema:
+            $ref: "#/definitions/FileSet"
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Client error"
+        401:
+          description: "Unauthorized"
+        422:
+          description: "Failed"
+  /fileset/{id}:
+    get:
+      summary: "Displays a fileset"
+      operationId: "showFileSet"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Identifier of the fileset to be displayed"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "Success"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not found"
+    put:
+      summary: "Updates an existing fileset"
+      operationId: "updateFileSet"
+      consumes:
+        - "application/json"
+        - "application/xml"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Metadata for the fileset"
+          required: true
+          schema:
+            $ref: "#/definitions/FileSet"
+        - in: "path"
+          name: "id"
+          description: "Identifier of the fileset to be displayed"
+          required: true
+          type: "string"
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Client error"
+        401:
+          description: "Unauthorized"
+        422:
+          description: "Failed"
+    delete:
+      summary: "Deletes a fileset"
+      operationId: "deleteFileSet"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Identifier of the resource"
+          required: true
+          type: "string"
+      responses:
+        204:
+          description: "Success"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not found"
+        422:
+          description: "Failed"
+  /files:
+    post:
+      summary: "Creates a new file"
+      operationId: "createFile"
+      consumes:
+        - "application/json"
+        - "application/xml"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Metadata and binary content for the file"
+          required: true
+          schema:
+            $ref: "#/definitions/File"
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Client error"
+        401:
+          description: "Unauthorized"
+        422:
+          description: "Failed"
+  /files/{id}:
+    get:
+      summary: "Downloads a file"
+      operationId: "showFile"
+      produces:
+        - "application/octet-stream"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Identifier of the file to be downloaded"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "Success"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not found"
+    put:
+      summary: "Updates an existing file with a new version"
+      operationId: "versionFile"
+      consumes:
+        - "application/json"
+        - "application/xml"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Metadata and binary content for the file"
+          required: true
+          schema:
+            $ref: "#/definitions/File"
+        - in: "path"
+          name: "id"
+          description: "Identifier of the file"
+          required: true
+          type: "string"
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Client error"
+        401:
+          description: "Unauthorized"
+        422:
+          description: "Failed"
+    delete:
+      summary: "Deletes a file"
+      operationId: "deleteFile"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Identifier of the resource"
+          required: true
+          type: "string"
+      responses:
+        204:
+          description: "Success"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not found"
+        422:
+          description: "Failed"
+  /agents:
+    get:
+      summary: "Displays all agents"
+      operationId: "listAgents"
+      consumes:
+        - "application/json"
+        - "application/xml"
+      produces:
+        - "application/xml"
+        - "application/json"
+      responses:
+        200:
+          description: "Successfully returned response"
+        401:
+          description: "Unauthorized to view agents"
+    post:
+      summary: "Creates a new agent"
+      operationId: "createAgent"
+      consumes:
+        - "application/json"
+        - "application/xml"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Metadata for the agent"
+          required: true
+          schema:
+            $ref: "#/definitions/Agent"
+      responses:
+        201:
+          description: "Successfully created"
+        400:
+          description: "Failed to create resource due to client error"
+        401:
+          description: "Unauthorized to create new resources"
+        422:
+          description: "Well-formed client request but failed to create resource"
+  /agents/{id}:
+    get:
+      summary: "Displays an agent"
+      operationId: "showAgent"
+      consumes:
+        - "application/json"
+        - "application/xml"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Identifier of the agent to be displayed"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "Successfully returned response"
+        401:
+          description: "Unauthorized to view agent"
+        404:
+          description: "Agent not found"
+    put:
+      summary: "Updates an existing agent"
+      operationId: "updateAgent"
+      consumes:
+        - "application/json"
+        - "application/xml"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Metadata for the agent"
+          required: true
+          schema:
+            $ref: "#/definitions/Agent"
+        - in: "path"
+          name: "id"
+          description: "Identifier of the agent"
+          required: true
+          type: "string"
+      responses:
+        201:
+          description: "Successfully created"
+        400:
+          description: "Failed to create resource due to client error"
+        401:
+          description: "Unauthorized to create new resources"
+        422:
+          description: "Well-formed client request but failed to create resource"
+    delete:
+      summary: "Deletes an agent"
+      operationId: "deleteAgent"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Identifier of the resource"
+          required: true
+          type: "string"
+      responses:
+        204:
+          description: "Success"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not found"
+        422:
+          description: "Failed"
+
+# Array of Schema Objects used to define the concepts/models (see https://swagger.io/specification/#schemaObject)
+definitions:
+  Id:
+    type: "object"
+    required:
+      - "id"
+    properties:
+      id:
+        type: "string"
+  Work:
+    type: "object"
+    required:
+      - "title"
+      - "creator"
+      - "keyword"
+      - "rights"
+      - "description"
+      - "resource_type"
+      - "depositor"
+    properties:
+      id:
+        $ref: "#/definitions/Id"
+      title:
+        type: "string"
+        example: "My Great Work"
+      subtitle:
+        type: "array"
+        items:
+          type: "string"
+      creator:
+        type: "array"
+        items:
+          $ref: "#/definitions/Agent"
+      keyword:
+        type: "array"
+        items:
+          type: "string"
+      rights:
+        type: "string"
+        enum:
+          - "https://creativecommons.org/licenses/by/4.0/"
+          - "https://creativecommons.org/licenses/by-sa/4.0/"
+          - "https://creativecommons.org/licenses/by-nc/4.0/"
+          - "https://creativecommons.org/licenses/by-nd/4.0/"
+          - "https://creativecommons.org/licenses/by-nc-nd/4.0/"
+          - "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+          - "http://creativecommons.org/publicdomain/mark/1.0/"
+          - "http://creativecommons.org/publicdomain/zero/1.0/"
+          - "http://www.europeana.eu/portal/rights/rr-r.html"
+          - "http://www.apache.org/licenses/LICENSE-2.0"
+          - "https://www.gnu.org/licenses/gpl.html"
+          - "https://opensource.org/licenses/MIT"
+      description:
+        type: "array"
+        items:
+          type: "string"
+      resource_type:
+        type: "string"
+        enum:
+          - "Article"
+          - "Audio"
+          - "Book"
+          - "Capstone Project"
+          - "Conference Proceeding"
+          - "Dataset"
+          - "Dissertation"
+          - "Image"
+          - "Journal"
+          - "Map or Cartographic Material"
+          - "Masters Thesis"
+          - "Part of Book"
+          - "Poster"
+          - "Presentation"
+          - "Project"
+          - "Report"
+          - "Research Paper"
+          - "Software or Program Code"
+          - "Video"
+          - "Other"
+      contributor:
+        type: "array"
+        items:
+          type: "string"
+      publisher:
+        type: "array"
+        items:
+          type: "string"
+      published_date:
+        type: "array"
+        items:
+          type: "string"
+      subject:
+        type: "array"
+        items:
+          type: "string"
+      language:
+        type: "array"
+        items:
+          type: "string"
+      identifier:
+        type: "array"
+        items:
+          type: "string"
+      based_near:
+        type: "array"
+        items:
+          type: "string"
+      related_url:
+        type: "array"
+        items:
+          type: "string"
+      source:
+        type: "array"
+        items:
+          type: "string"
+      depositor:
+        $ref: "#/definitions/Agent"
+  FileSet:
+    type: "object"
+    required:
+      - "member_of"
+      - "members"
+      - "depositor"
+    properties:
+      id:
+        $ref: "#/definitions/Id"
+      title:
+        type: "string"
+        example: "Fileset in the Great Work"
+      member_of:
+        $ref: "#/definitions/Work"
+      members:
+        type: "array"
+        items:
+          $ref: "#/definitions/File"
+      depositor:
+        $ref: "#/definitions/Agent"
+  File:
+    type: "object"
+    required:
+      - "content"
+    properties:
+      id:
+        $ref: "#/definitions/Id"
+      content:
+        type: "string"
+        format: "binary"
+  Agent:
+    type: "object"
+    required:
+      - "display_name"
+    properties:
+      id:
+        $ref: "#/definitions/Id"
+      surname:
+        type: "string"
+        example: "Doe"
+      given_name:
+        type: "string"
+        example: "John Quincy"
+      email:
+        type: "string"
+        example: "jqd99@psu.edu"
+      access_id:
+        type: "string"
+        example: "jqd99"
+      aliases:
+        type: "array"
+        items:
+          type: "string"
+      display_name:
+        type: "string"
