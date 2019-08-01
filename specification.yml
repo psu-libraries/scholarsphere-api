@@ -20,24 +20,26 @@ schemes:
 # Listing of the basic model concepts used in the application (see https://swagger.io/specification/#tagObject)
 tags:
   - name: "work"
-    description: "Resource with descriptive and administrative metadata that contains files"
+    description: "Resource with descriptive and administrative metadata that contains files."
     externalDocs:
       description: "PCDM object"
       url: "http://pcdm.org/models#Object"
   - name: "fileset"
-    description: "Resource containing one original source file, and zero or more derivative files"
+    description: "Resource containing one original source file, and zero or more derivative files."
     externalDocs:
       description: "PCDM object"
       url: "http://pcdm.org/models#Object"
   - name: "file"
-    description: "Binary data and accompanying metadata"
+    description: "Binary data and accompanying metadata."
     externalDocs:
       description: "PCDM file"
       url: "http://pcdm.org/models#File"
   - name: "agent"
-    description: "Person or organization that is identified as the creator or contributor to a work"
+    description: "Unique person or organization associated work."
+  - name: "alias"
+    description: "An alternative name for an agent. There can be many alias for one agent."
   - name: "id"
-    description: "Alphanumeric string used as a unique identifier"
+    description: "Alphanumeric string used as a unique identifier."
 
 # Paths Object, containing multiple Path Item Objects. Each path item will contain multiple Operation Objects.
 # See:
@@ -312,9 +314,6 @@ paths:
     get:
       summary: "Displays all agents"
       operationId: "listAgents"
-      consumes:
-        - "application/json"
-        - "application/xml"
       produces:
         - "application/xml"
         - "application/json"
@@ -329,9 +328,6 @@ paths:
       consumes:
         - "application/json"
         - "application/xml"
-      produces:
-        - "application/xml"
-        - "application/json"
       parameters:
         - in: "body"
           name: "body"
@@ -340,21 +336,18 @@ paths:
           schema:
             $ref: "#/definitions/Agent"
       responses:
-        201:
-          description: "Successfully created"
+        204:
+          description: "Success"
         400:
-          description: "Failed to create resource due to client error"
+          description: "Client error"
         401:
-          description: "Unauthorized to create new resources"
+          description: "Unauthorized"
         422:
-          description: "Well-formed client request but failed to create resource"
+          description: "Failed"
   /agents/{id}:
     get:
       summary: "Displays an agent"
       operationId: "showAgent"
-      consumes:
-        - "application/json"
-        - "application/xml"
       produces:
         - "application/xml"
         - "application/json"
@@ -366,20 +359,17 @@ paths:
           type: "string"
       responses:
         200:
-          description: "Successfully returned response"
+          description: "Success"
         401:
-          description: "Unauthorized to view agent"
+          description: "Unauthorized"
         404:
-          description: "Agent not found"
+          description: "Not found"
     put:
       summary: "Updates an existing agent"
       operationId: "updateAgent"
       consumes:
         - "application/json"
         - "application/xml"
-      produces:
-        - "application/xml"
-        - "application/json"
       parameters:
         - in: "body"
           name: "body"
@@ -393,14 +383,14 @@ paths:
           required: true
           type: "string"
       responses:
-        201:
-          description: "Successfully created"
+        204:
+          description: "Success"
         400:
-          description: "Failed to create resource due to client error"
+          description: "Client error"
         401:
-          description: "Unauthorized to create new resources"
+          description: "Unauthorized"
         422:
-          description: "Well-formed client request but failed to create resource"
+          description: "Failed"
     delete:
       summary: "Deletes an agent"
       operationId: "deleteAgent"
@@ -452,7 +442,7 @@ definitions:
       creator:
         type: "array"
         items:
-          $ref: "#/definitions/Agent"
+          $ref: "#/definitions/Alias"
       keyword:
         type: "array"
         items:
@@ -570,7 +560,7 @@ definitions:
   Agent:
     type: "object"
     required:
-      - "display_name"
+      - "surname"
     properties:
       id:
         $ref: "#/definitions/Id"
@@ -583,12 +573,19 @@ definitions:
       email:
         type: "string"
         example: "jqd99@psu.edu"
-      access_id:
+      psu_id:
         type: "string"
         example: "jqd99"
-      aliases:
-        type: "array"
-        items:
-          type: "string"
+      orcid_id:
+        type: "string"
+  Alias:
+    type: "object"
+    required:
+      - "agent"
+      - "display_name"
+    properties:
+      agent:
+        $ref: "#/definitions/Agent"
       display_name:
         type: "string"
+
