@@ -1,0 +1,774 @@
+# Swagger spec for Scholarsphere (see https://swagger.io/specification/)
+
+openapi: "3.0.2"
+info:
+  title: "Scholarsphere"
+  description: "API specification for Scholarsphere"
+  termsOfService: "https://scholarsphere.psu.edu/about"
+  contact:
+    name: "Scholarsphere Support"
+    email: "umg-up.its.scholarsphere-support@groups.ucs.psu.edu"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+  version: "0.1.0"
+
+servers:
+  - url: "https://api.scholarsphere.psu.edu/{version}"
+    description: "Public-facing production API endpoint"
+    variables:
+      version:
+        description: "Version of the API"
+        enum:
+          - "v1"
+          - "v2"
+        default: "v1"
+  - url: "https://api-qa.scholarsphere.psu.edu/{version}"
+    description: "Internal API endpoint for QA testing"
+    variables:
+      version:
+        description: "Version of the API"
+        enum:
+          - "v1"
+          - "v2"
+        default: "v1"
+
+# Listing of the basic model concepts used in the application (see https://swagger.io/specification/#tagObject)
+tags:
+  - name: "Work"
+    description: "Descriptive resource containing file sets and metadata."
+    externalDocs:
+      description: "PCDM object"
+      url: "http://pcdm.org/models#Object"
+  - name: "FileSet"
+    description: "Resource containing one original file and zero or more derivative files."
+    externalDocs:
+      description: "PCDM object"
+      url: "http://pcdm.org/models#Object"
+  - name: "File"
+    description: "Binary data and accompanying metadata."
+    externalDocs:
+      description: "PCDM file"
+      url: "http://pcdm.org/models#File"
+  - name: "Agent"
+    description: "Unique person or organization associated work."
+  - name: "Alias"
+    description: "An alternative name for an agent. There can be many alias for one agent."
+  - name: "Identifier"
+    description: "Alphanumeric string used as a unique identifier."
+
+# Paths Object, containing multiple Path Item Objects. Each path item will contain multiple Operation Objects.
+# See:
+#   https://swagger.io/specification/#pathsObject
+#   https://swagger.io/specification/#pathItemObject
+#   https://swagger.io/specification/#operationObject
+paths:
+  /works:
+    post:
+      tags: ["Work"]
+      summary: "Creates a new work"
+      description: >-
+        Client posts required metadata in JSON format to the endpoint, and if successful, a new work is
+        created and returned to the client.
+      operationId: "createWork"
+      requestBody:
+        description: "Metadata for new work"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Work"
+            examples:
+              minimal:
+                summary: "Work with only required metadata"
+                description: >-
+                  Client posts metadata the minimal amount of required metadata in order for a new work to be created.
+                  This includes only the display name of any creators, and the PSU network id of the user creating
+                  the new work.
+
+                  If the display name does not correspond to any existing Agent, a new one is created with name parsed
+                  into given and surnanmes, and a new Alias created linking the new Agent to the display name.
+                value:
+                  title: "Work with Minimal Metadata"
+                  creator:
+                    display_name: "John Doe"
+                  keyword:
+                    - "keyword-1"
+                    - "keyword-2"
+                  rights: "https://creativecommons.org/licenses/by/4.0/"
+                  description: >-
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                    labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
+                    nisi ut aliquip ex ea commodo consequat.
+                  resource_type: "Article"
+                  depositor:
+                    psu_id: "xyz123"
+              complete:
+                summary: "Work with complete metadata"
+                description: >-
+                  A work with complete metadata, including multiple creators. If these creators do not exist in the
+                  system, new agent resources will be created using the supplied metadata. If the agent resources do
+                  exist, then their records will be updated using the supplied metadata.
+                value:
+                  title: "Work with Complete Metadata"
+                  creator:
+                    - surname: "Doe"
+                      given_name: "John Quincy"
+                      display_name: "John Doe"
+                      psu_id: "jqd12"
+                      email: "jqd12@psu.edu"
+                      orcid_id: "88888888"
+                    - surname: "Doe"
+                      given_name: "Jane Quinn"
+                      display_name: "Jane Doe"
+                      psu_id: "jqd13"
+                      email: "jqd13@psu.edu"
+                      orcid_id: "99999999"
+                  keyword:
+                    - "keyword-1"
+                    - "keyword-2"
+                  rights: "https://creativecommons.org/licenses/by/4.0/"
+                  description: >-
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                    labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
+                    nisi ut aliquip ex ea commodo consequat.
+                  resource_type: "Article"
+                  depositor:
+                    psu_id: "xyz123"
+                  contributor:
+                    - "First Contributor"
+                    - "Second Contributor"
+                  publisher:
+                    - "First Publisher"
+                    - "Second Publisher"
+                  published_date:
+                    - "2019"
+                  subject:
+                    - "Subject One"
+                    - "Subject Two"
+                  language:
+                    - "English"
+                  identifier:
+                    - "alternate-id-1234"
+                  based_near:
+                    - "State College, PA"
+                  related_url:
+                    - "http://realted.url.com"
+                  source:
+                    - "Source of material"
+
+      security:
+        - psuKey: []
+      responses:
+        200:
+          description: >-
+            Work is successfully created and the client recieves a description of the new work.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Work"
+              examples:
+                work:
+                  summary: "Newly created work"
+                  value:
+                    id: "bdec3693-c4c1-42dd-9067-b1e15e5ef2f5"
+                    title: "Work with Minimal Metadata"
+                    creator:
+                      - surname: "Doe"
+                        given_name: "John Quincy"
+                        display_name: "John Doe"
+                        psu_id: "jqd12"
+                        email: "jqd12@psu.edu"
+                        orcid_id: "88888888"
+                    keyword:
+                      - "keyword-1"
+                      - "keyword-2"
+                    rights: "https://creativecommons.org/licenses/by/4.0/"
+                    description: >-
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                      labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
+                      nisi ut aliquip ex ea commodo consequat.
+                    resource_type: "Article"
+        default:
+          description: >-
+            The resource is not created due to an error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                unauthorized:
+                  summary: "The client is not authorized to created new resources"
+                  value:
+                    code: 400
+                    message: "Unauthorized"
+                incomplete:
+                  summary: "Request is missing required fields"
+                  value:
+                    code: 422
+                    message: "Failed to create work due to missing fields: title"
+                error:
+                  summary: "Client request is incorrect"
+                  value:
+                    code: 400
+                    message: "Cannot create work"
+  /works/{id}:
+    get:
+      tags: ["Work"]
+      summary: "Displays a work"
+      operationId: "showWork"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Identifier of the resource"
+          required: true
+          schema:
+            $ref: "#/components/schemas/Id"
+      security:
+        - psuKey: []
+      responses:
+        200:
+          description: "Success"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not found"
+    put:
+      tags: ["Work"]
+      summary: "Updates an existing work"
+      operationId: "updateWork"
+      parameters:
+        - in: "header"
+          name: "metadata"
+          description: "Metadata for the resource"
+          required: true
+          schema:
+            $ref: "#/components/schemas/Work"
+        - in: "path"
+          name: "id"
+          description: "Identifier of the resource"
+          required: true
+          schema:
+            $ref: "#/components/schemas/Id"
+      security:
+        - psuKey: []
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Client error"
+        401:
+          description: "Unauthorized"
+        422:
+          description: "Failed"
+    delete:
+      tags: ["Work"]
+      summary: "Deletes a work"
+      operationId: "deleteWork"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Identifier of the resource"
+          required: true
+          schema:
+            $ref: "#/components/schemas/Id"
+      security:
+        - psuKey: []
+      responses:
+        204:
+          description: "Success"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not found"
+        422:
+          description: "Failed"
+  /filesets:
+    post:
+      tags: ["FileSet"]
+      summary: "Creates a new fileset"
+      operationId: "createFileSet"
+      parameters:
+        - in: "header"
+          name: "metadata"
+          description: "Metadata for the fileset"
+          required: true
+          schema:
+            $ref: "#/components/schemas/FileSet"
+      security:
+        - psuKey: []
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Client error"
+        401:
+          description: "Unauthorized"
+        422:
+          description: "Failed"
+  /filesets/{id}:
+    get:
+      tags: ["FileSet"]
+      summary: "Displays a fileset"
+      operationId: "showFileSet"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Identifier of the fileset to be displayed"
+          required: true
+          schema:
+            $ref: "#/components/schemas/Id"
+      security:
+        - psuKey: []
+      responses:
+        200:
+          description: "Success"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not found"
+    put:
+      tags: ["FileSet"]
+      summary: "Updates an existing fileset"
+      operationId: "updateFileSet"
+      parameters:
+        - in: "header"
+          name: "metadata"
+          description: "Metadata for the fileset"
+          required: true
+          schema:
+            $ref: "#/components/schemas/FileSet"
+        - in: "path"
+          name: "id"
+          description: "Identifier of the fileset to be displayed"
+          required: true
+          schema:
+            $ref: "#/components/schemas/Id"
+      security:
+        - psuKey: []
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Client error"
+        401:
+          description: "Unauthorized"
+        422:
+          description: "Failed"
+    delete:
+      tags: ["FileSet"]
+      summary: "Deletes a fileset"
+      operationId: "deleteFileSet"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Identifier of the resource"
+          required: true
+          schema:
+            $ref: "#/components/schemas/Id"
+      security:
+        - psuKey: []
+      responses:
+        204:
+          description: "Success"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not found"
+        422:
+          description: "Failed"
+  /files:
+    post:
+      tags: ["File"]
+      summary: "Creates a new file"
+      operationId: "createFile"
+      parameters:
+        - in: "header"
+          name: "metadata"
+          description: "Metadata and binary content for the file"
+          required: true
+          schema:
+            $ref: "#/components/schemas/File"
+      security:
+        - psuKey: []
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Client error"
+        401:
+          description: "Unauthorized"
+        422:
+          description: "Failed"
+  /files/{id}:
+    get:
+      tags: ["File"]
+      summary: "Downloads a file"
+      operationId: "showFile"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Identifier of the file to be downloaded"
+          required: true
+          schema:
+            $ref: "#/components/schemas/Id"
+      security:
+        - psuKey: []
+      responses:
+        200:
+          description: "Success"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not found"
+    put:
+      tags: ["File"]
+      summary: "Updates an existing file with a new version"
+      operationId: "versionFile"
+      parameters:
+        - in: "header"
+          name: "metadata"
+          description: "Metadata and binary content for the file"
+          required: true
+          schema:
+            $ref: "#/components/schemas/File"
+        - in: "path"
+          name: "id"
+          description: "Identifier of the file"
+          required: true
+          schema:
+            $ref: "#/components/schemas/Id"
+      security:
+        - psuKey: []
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Client error"
+        401:
+          description: "Unauthorized"
+        422:
+          description: "Failed"
+    delete:
+      tags: ["File"]
+      summary: "Deletes a file"
+      operationId: "deleteFile"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Identifier of the resource"
+          required: true
+          schema:
+            $ref: "#/components/schemas/Id"
+      security:
+        - psuKey: []
+      responses:
+        204:
+          description: "Success"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not found"
+        422:
+          description: "Failed"
+  /agents:
+    get:
+      tags: ["Agent"]
+      summary: "Displays all agents"
+      operationId: "listAgents"
+      security:
+        - psuKey: []
+      responses:
+        200:
+          description: "Successfully returned response"
+        401:
+          description: "Unauthorized to view agents"
+    post:
+      tags: ["Agent"]
+      summary: "Creates a new agent"
+      operationId: "createAgent"
+      parameters:
+        - in: "header"
+          name: "metadata"
+          description: "Metadata for the agent"
+          required: true
+          schema:
+            $ref: "#/components/schemas/Agent"
+      security:
+        - psuKey: []
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Client error"
+        401:
+          description: "Unauthorized"
+        422:
+          description: "Failed"
+  /agents/{id}:
+    get:
+      tags: ["Agent"]
+      summary: "Displays an agent"
+      operationId: "showAgent"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Identifier of the agent to be displayed"
+          required: true
+          schema:
+            $ref: "#/components/schemas/Id"
+      security:
+        - psuKey: []
+      responses:
+        200:
+          description: "Success"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not found"
+    put:
+      tags: ["Agent"]
+      summary: "Updates an existing agent"
+      operationId: "updateAgent"
+      parameters:
+        - in: "header"
+          name: "metadata"
+          description: "Metadata for the agent"
+          required: true
+          schema:
+            $ref: "#/components/schemas/Agent"
+        - in: "path"
+          name: "id"
+          description: "Identifier of the agent"
+          required: true
+          schema:
+            $ref: "#/components/schemas/Id"
+      security:
+        - psuKey: []
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Client error"
+        401:
+          description: "Unauthorized"
+        422:
+          description: "Failed"
+    delete:
+      tags: ["Agent"]
+      summary: "Deletes an agent"
+      operationId: "deleteAgent"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Identifier of the resource"
+          required: true
+          schema:
+            $ref: "#/components/schemas/Id"
+      security:
+        - psuKey: []
+      responses:
+        204:
+          description: "Success"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not found"
+        422:
+          description: "Failed"
+
+# Array of Schema Objects used to define the concepts/models (see https://swagger.io/specification/#schemaObject)
+components:
+  schemas:
+    Id:
+      type: "object"
+      required:
+        - "id"
+      properties:
+        id:
+          type: "string"
+    Work:
+      type: "object"
+      required:
+        - "title"
+        - "creator"
+        - "keyword"
+        - "rights"
+        - "description"
+        - "resource_type"
+        - "depositor"
+      properties:
+        id:
+          $ref: "#/components/schemas/Id"
+        title:
+          type: "string"
+          example: "My Great Work"
+        subtitle:
+          type: "array"
+          items:
+            type: "string"
+        creator:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Alias"
+        keyword:
+          type: "array"
+          items:
+            type: "string"
+        rights:
+          type: "string"
+          enum:
+            - "https://creativecommons.org/licenses/by/4.0/"
+            - "https://creativecommons.org/licenses/by-sa/4.0/"
+            - "https://creativecommons.org/licenses/by-nc/4.0/"
+            - "https://creativecommons.org/licenses/by-nd/4.0/"
+            - "https://creativecommons.org/licenses/by-nc-nd/4.0/"
+            - "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+            - "http://creativecommons.org/publicdomain/mark/1.0/"
+            - "http://creativecommons.org/publicdomain/zero/1.0/"
+            - "http://www.europeana.eu/portal/rights/rr-r.html"
+            - "http://www.apache.org/licenses/LICENSE-2.0"
+            - "https://www.gnu.org/licenses/gpl.html"
+            - "https://opensource.org/licenses/MIT"
+        description:
+          type: "array"
+          items:
+            type: "string"
+        resource_type:
+          type: "string"
+          enum:
+            - "Article"
+            - "Audio"
+            - "Book"
+            - "Capstone Project"
+            - "Conference Proceeding"
+            - "Dataset"
+            - "Dissertation"
+            - "Image"
+            - "Journal"
+            - "Map or Cartographic Material"
+            - "Masters Thesis"
+            - "Part of Book"
+            - "Poster"
+            - "Presentation"
+            - "Project"
+            - "Report"
+            - "Research Paper"
+            - "Software or Program Code"
+            - "Video"
+            - "Other"
+        contributor:
+          type: "array"
+          items:
+            type: "string"
+        publisher:
+          type: "array"
+          items:
+            type: "string"
+        published_date:
+          type: "array"
+          items:
+            type: "string"
+        subject:
+          type: "array"
+          items:
+            type: "string"
+        language:
+          type: "array"
+          items:
+            type: "string"
+        identifier:
+          type: "array"
+          items:
+            type: "string"
+        based_near:
+          type: "array"
+          items:
+            type: "string"
+        related_url:
+          type: "array"
+          items:
+            type: "string"
+        source:
+          type: "array"
+          items:
+            type: "string"
+        depositor:
+          $ref: "#/components/schemas/Agent"
+    FileSet:
+      type: "object"
+      required:
+        - "member_of"
+        - "members"
+        - "depositor"
+      properties:
+        id:
+          $ref: "#/components/schemas/Id"
+        title:
+          type: "string"
+          example: "Fileset in the Great Work"
+        member_of:
+          $ref: "#/components/schemas/Work"
+        members:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/File"
+        depositor:
+          $ref: "#/components/schemas/Agent"
+    File:
+      type: "object"
+      required:
+        - "content"
+      properties:
+        id:
+          $ref: "#/components/schemas/Id"
+        content:
+          type: "string"
+          format: "binary"
+    Agent:
+      type: "object"
+      required:
+        - "surname"
+      properties:
+        id:
+          $ref: "#/components/schemas/Id"
+        surname:
+          type: "string"
+          example: "Doe"
+        given_name:
+          type: "string"
+          example: "John Quincy"
+        email:
+          type: "string"
+          example: "jqd99@psu.edu"
+        psu_id:
+          type: "string"
+          example: "jqd99"
+        orcid_id:
+          type: "string"
+    Alias:
+      type: "object"
+      required:
+        - "agent"
+        - "display_name"
+      properties:
+        agent:
+          $ref: "#/components/schemas/Agent"
+        display_name:
+          type: "string"
+    Error:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+  securitySchemes:
+    psuKey:
+      type: "apiKey"
+      description: "Example authorization mechanism to connect to the API. The implementation of generation and authorization will be resolved at a later date."
+      name: "key"
+      in: "header"
