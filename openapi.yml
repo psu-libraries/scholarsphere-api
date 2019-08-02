@@ -68,16 +68,17 @@ paths:
       tags: ["Work"]
       summary: "Creates a new work"
       description: >-
-        Client posts required metadata in JSON format to the endpoint, and if successful, a new work is
-        created and returned to the client.
+        Client posts the required metadata and one or more binary files to the endpoint. If successful, a new work is
+        created and returned to the client. Any files sent with the request will be processed asynchronously and
+        added to the works as file sets.
       operationId: "createWork"
       requestBody:
         description: "Metadata for new work"
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: "#/components/schemas/Work"
+              $ref: "#/components/schemas/CreateWork"
             examples:
               minimal:
                 summary: "Work with only required metadata"
@@ -156,7 +157,6 @@ paths:
                     - "http://realted.url.com"
                   source:
                     - "Source of material"
-
       security:
         - psuKey: []
       responses:
@@ -190,32 +190,13 @@ paths:
                       nisi ut aliquip ex ea commodo consequat.
                     resource_type: "Article"
         default:
-          description: >-
-            The resource is not created due to an error.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-              examples:
-                unauthorized:
-                  summary: "The client is not authorized to created new resources"
-                  value:
-                    code: 400
-                    message: "Unauthorized"
-                incomplete:
-                  summary: "Request is missing required fields"
-                  value:
-                    code: 422
-                    message: "Failed to create work due to missing fields: title"
-                error:
-                  summary: "Client request is incorrect"
-                  value:
-                    code: 400
-                    message: "Cannot create work"
+          $ref: "#/components/responses/defaultPostError"
   /works/{id}:
     get:
       tags: ["Work"]
       summary: "Displays a work"
+      description: >-
+        Returns all the associated metadata of a work, inlcuding its
       operationId: "showWork"
       parameters:
         - in: "path"
@@ -228,39 +209,73 @@ paths:
         - psuKey: []
       responses:
         200:
-          description: "Success"
-        401:
-          description: "Unauthorized"
-        404:
-          description: "Not found"
+          description: >-
+            Returns the work and its associated metadata.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Work"
+        default:
+          $ref: "#/components/responses/defaultGetError"
     put:
       tags: ["Work"]
       summary: "Updates an existing work"
       operationId: "updateWork"
       parameters:
-        - in: "header"
-          name: "metadata"
-          description: "Metadata for the resource"
-          required: true
-          schema:
-            $ref: "#/components/schemas/Work"
         - in: "path"
           name: "id"
           description: "Identifier of the resource"
           required: true
           schema:
             $ref: "#/components/schemas/Id"
+      requestBody:
+        description: "Metadata with which to update the work"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateWork"
+            examples:
+              update:
+                summary: "Updating the title of a work"
+                description: >-
+                  Client posts updated metadata and changes are applied to the work.
+                value:
+                  title: "New Updated Title"
       security:
         - psuKey: []
       responses:
-        204:
-          description: "Success"
-        400:
-          description: "Client error"
-        401:
-          description: "Unauthorized"
-        422:
-          description: "Failed"
+        200:
+          description: >-
+            Work is successfully updated and the client recieves the complete, updated work.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Work"
+              examples:
+                work:
+                  summary: "Sample updated work"
+                  value:
+                    id: "190500f8-8f7e-4bd4-bcf3-f9673cd6c580"
+                    title: "New Updated Title"
+                    creator:
+                      - surname: "Doe"
+                        given_name: "John Quincy"
+                        display_name: "John Doe"
+                        psu_id: "jqd12"
+                        email: "jqd12@psu.edu"
+                        orcid_id: "88888888"
+                    keyword:
+                      - "keyword-1"
+                      - "keyword-2"
+                    rights: "https://creativecommons.org/licenses/by/4.0/"
+                    description: >-
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                      labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
+                      nisi ut aliquip ex ea commodo consequat.
+                    resource_type: "Article"
+        default:
+          $ref: "#/components/responses/defaultPutError"
     delete:
       tags: ["Work"]
       summary: "Deletes a work"
@@ -275,14 +290,10 @@ paths:
       security:
         - psuKey: []
       responses:
-        204:
-          description: "Success"
-        401:
-          description: "Unauthorized"
-        404:
-          description: "Not found"
-        422:
-          description: "Failed"
+        200:
+          $ref: "#/components/responses/defaultDeleteSuccess"
+        default:
+          $ref: "#/components/responses/defaultDeleteError"
   /filesets:
     post:
       tags: ["FileSet"]
@@ -300,12 +311,8 @@ paths:
       responses:
         204:
           description: "Success"
-        400:
-          description: "Client error"
-        401:
-          description: "Unauthorized"
-        422:
-          description: "Failed"
+        default:
+          $ref: "#/components/responses/defaultPostError"
   /filesets/{id}:
     get:
       tags: ["FileSet"]
@@ -323,10 +330,8 @@ paths:
       responses:
         200:
           description: "Success"
-        401:
-          description: "Unauthorized"
-        404:
-          description: "Not found"
+        default:
+          $ref: "#/components/responses/defaultGetError"
     put:
       tags: ["FileSet"]
       summary: "Updates an existing fileset"
@@ -349,12 +354,8 @@ paths:
       responses:
         204:
           description: "Success"
-        400:
-          description: "Client error"
-        401:
-          description: "Unauthorized"
-        422:
-          description: "Failed"
+        default:
+          $ref: "#/components/responses/defaultPutError"
     delete:
       tags: ["FileSet"]
       summary: "Deletes a fileset"
@@ -371,12 +372,8 @@ paths:
       responses:
         204:
           description: "Success"
-        401:
-          description: "Unauthorized"
-        404:
-          description: "Not found"
-        422:
-          description: "Failed"
+        default:
+          $ref: "#/components/responses/defaultDeleteError"
   /files:
     post:
       tags: ["File"]
@@ -394,12 +391,8 @@ paths:
       responses:
         204:
           description: "Success"
-        400:
-          description: "Client error"
-        401:
-          description: "Unauthorized"
-        422:
-          description: "Failed"
+        default:
+          $ref: "#/components/responses/defaultPostError"
   /files/{id}:
     get:
       tags: ["File"]
@@ -417,10 +410,8 @@ paths:
       responses:
         200:
           description: "Success"
-        401:
-          description: "Unauthorized"
-        404:
-          description: "Not found"
+        default:
+          $ref: "#/components/responses/defaultGetError"
     put:
       tags: ["File"]
       summary: "Updates an existing file with a new version"
@@ -443,12 +434,8 @@ paths:
       responses:
         204:
           description: "Success"
-        400:
-          description: "Client error"
-        401:
-          description: "Unauthorized"
-        422:
-          description: "Failed"
+        default:
+          $ref: "#/components/responses/defaultPutError"
     delete:
       tags: ["File"]
       summary: "Deletes a file"
@@ -465,12 +452,8 @@ paths:
       responses:
         204:
           description: "Success"
-        401:
-          description: "Unauthorized"
-        404:
-          description: "Not found"
-        422:
-          description: "Failed"
+        default:
+          $ref: "#/components/responses/defaultDeleteError"
   /agents:
     get:
       tags: ["Agent"]
@@ -481,8 +464,8 @@ paths:
       responses:
         200:
           description: "Successfully returned response"
-        401:
-          description: "Unauthorized to view agents"
+        default:
+          $ref: "#/components/responses/defaultGetError"
     post:
       tags: ["Agent"]
       summary: "Creates a new agent"
@@ -499,12 +482,8 @@ paths:
       responses:
         204:
           description: "Success"
-        400:
-          description: "Client error"
-        401:
-          description: "Unauthorized"
-        422:
-          description: "Failed"
+        default:
+          $ref: "#/components/responses/defaultPostError"
   /agents/{id}:
     get:
       tags: ["Agent"]
@@ -522,10 +501,8 @@ paths:
       responses:
         200:
           description: "Success"
-        401:
-          description: "Unauthorized"
-        404:
-          description: "Not found"
+        default:
+          $ref: "#/components/responses/defaultGetError"
     put:
       tags: ["Agent"]
       summary: "Updates an existing agent"
@@ -548,12 +525,8 @@ paths:
       responses:
         204:
           description: "Success"
-        400:
-          description: "Client error"
-        401:
-          description: "Unauthorized"
-        422:
-          description: "Failed"
+        default:
+          $ref: "#/components/responses/defaultPutError"
     delete:
       tags: ["Agent"]
       summary: "Deletes an agent"
@@ -570,36 +543,27 @@ paths:
       responses:
         204:
           description: "Success"
-        401:
-          description: "Unauthorized"
-        404:
-          description: "Not found"
-        422:
-          description: "Failed"
+        default:
+          $ref: "#/components/responses/defaultDeleteError"
 
 # Array of Schema Objects used to define the concepts/models (see https://swagger.io/specification/#schemaObject)
 components:
   schemas:
     Id:
       type: "object"
-      required:
-        - "id"
       properties:
         id:
           type: "string"
-    Work:
+    BasicMetadata:
       type: "object"
       required:
         - "title"
-        - "creator"
         - "keyword"
         - "rights"
         - "description"
         - "resource_type"
         - "depositor"
       properties:
-        id:
-          $ref: "#/components/schemas/Id"
         title:
           type: "string"
           example: "My Great Work"
@@ -607,10 +571,6 @@ components:
           type: "array"
           items:
             type: "string"
-        creator:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/Alias"
         keyword:
           type: "array"
           items:
@@ -657,6 +617,12 @@ components:
             - "Software or Program Code"
             - "Video"
             - "Other"
+        depositor:
+          type: "string"
+          example: "xyz123"
+    AdditionalMetadata:
+      type: "object"
+      properties:
         contributor:
           type: "array"
           items:
@@ -693,8 +659,54 @@ components:
           type: "array"
           items:
             type: "string"
-        depositor:
-          $ref: "#/components/schemas/Agent"
+    Creator:
+      type: "object"
+      properties:
+        creator:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Alias"
+    Work:
+      allOf:
+        - $ref: "#/components/schemas/Id"
+        - $ref: "#/components/schemas/BasicMetadata"
+        - $ref: "#/components/schemas/AdditionalMetadata"
+        - $ref: "#/components/schemas/Creator"
+        - type: "object"
+          properties:
+            member_ids:
+              type: "array"
+              items:
+                $ref: "#/components/schemas/Id"
+    CreateWork:
+      allOf:
+        - $ref: "#/components/schemas/BasicMetadata"
+        - $ref: "#/components/schemas/AdditionalMetadata"
+        - $ref: "#/components/schemas/Creator"
+        - type: "object"
+          required:
+            - "creator"
+            - "uploaded_files"
+          properties:
+            uploaded_files:
+              type: "array"
+              items:
+                type: "string"
+                format: "binary"
+    UpdateWork:
+      allOf:
+        - $ref: "#/components/schemas/BasicMetadata"
+        - $ref: "#/components/schemas/AdditionalMetadata"
+        - $ref: "#/components/schemas/Creator"
+        - type: "object"
+          required:
+            - "creator"
+          properties:
+            uploaded_files:
+              type: "array"
+              items:
+                type: "string"
+                format: "binary"
     FileSet:
       type: "object"
       required:
@@ -715,6 +727,16 @@ components:
             $ref: "#/components/schemas/File"
         depositor:
           $ref: "#/components/schemas/Agent"
+    NewFileSet:
+      allOf:
+        - $ref: "#/components/schemas/FileSet"
+        - type: "object"
+          required:
+            - "file"
+          properties:
+            file:
+              type: "string"
+              format: "binary"
     File:
       type: "object"
       required:
@@ -749,14 +771,25 @@ components:
     Alias:
       type: "object"
       required:
-        - "agent"
         - "display_name"
       properties:
-        agent:
-          $ref: "#/components/schemas/Agent"
         display_name:
           type: "string"
-    Error:
+        surname:
+          type: "string"
+          example: "Doe"
+        given_name:
+          type: "string"
+          example: "John Quincy"
+        email:
+          type: "string"
+          example: "jqd99@psu.edu"
+        psu_id:
+          type: "string"
+          example: "jqd99"
+        orcid_id:
+          type: "string"
+    ServerStatus:
       required:
         - code
         - message
@@ -772,3 +805,111 @@ components:
       description: "Example authorization mechanism to connect to the API. The implementation of generation and authorization will be resolved at a later date."
       name: "key"
       in: "header"
+  responses:
+    defaultPostError:
+      description: >-
+        If the resource can't be created, then there is some kind of error. The client can interpret the responses
+        as follows:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ServerStatus"
+          examples:
+            clientError:
+              $ref: "#/components/examples/clientError"
+            unauthorized:
+              $ref: "#/components/examples/unauthorized"
+            incomplete:
+              $ref: "#/components/examples/incomplete"
+            serverError:
+              $ref: "#/components/examples/serverError"
+    defaultPutError:
+      description: >-
+        If the resource can't be updated, then there is some kind of error. The client can interpret the responses
+        as follows:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ServerStatus"
+          examples:
+            clientError:
+              $ref: "#/components/examples/clientError"
+            unauthorized:
+              $ref: "#/components/examples/unauthorized"
+            incomplete:
+              $ref: "#/components/examples/incomplete"
+            serverError:
+              $ref: "#/components/examples/serverError"
+    defaultDeleteError:
+      description: >-
+        If the resource can't be deleted, then there is some kind of error. The client can interpret the responses
+        as follows:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ServerStatus"
+          examples:
+            clientError:
+              $ref: "#/components/examples/clientError"
+            unauthorized:
+              $ref: "#/components/examples/unauthorized"
+            notFound:
+              $ref: "#/components/examples/notFound"
+            serverError:
+              $ref: "#/components/examples/serverError"
+    defaultGetError:
+      description: >-
+        If the request is not successful, then the default is some kind of error.
+        The client can interpret as follows:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ServerStatus"
+          examples:
+            unauthorized:
+              $ref: "#/components/examples/unauthorized"
+            notFound:
+              $ref: "#/components/examples/notFound"
+            serverError:
+              $ref: "#/components/examples/serverError"
+    defaultDeleteSuccess:
+      description: >-
+        The resource was successfully deleted and a the client receives a confirmation message.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ServerStatus"
+          examples:
+            success:
+              summary: "The system successfully performed the operation"
+              value:
+                code: 200
+                message: "Success"
+  examples:
+    clientError:
+      summary: "The client request is incorrect"
+      value:
+        code: 400
+        message: "Error"
+    unauthorized:
+      summary: "The client is not authorized to perform the requested action"
+      value:
+        code: 401
+        message: "Unauthorized"
+    notFound:
+      summary: "The requested resource does not exist"
+      value:
+        code: 404
+        message: "Not Found"
+    incomplete:
+      summary: "The client request is valid, but contains incomplete or missing information"
+      value:
+        code: 422
+        message: "Unprocessable Entity"
+    serverError:
+      summary: "The server threw some kind of error or exception"
+      value:
+        code: 500
+        message: "Internal Server Error"
+
+
