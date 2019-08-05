@@ -294,34 +294,23 @@ paths:
           $ref: "#/components/responses/defaultDeleteSuccess"
         default:
           $ref: "#/components/responses/defaultDeleteError"
-  /filesets:
-    post:
-      tags: ["FileSet"]
-      summary: "Creates a new fileset"
-      operationId: "createFileSet"
-      parameters:
-        - in: "header"
-          name: "metadata"
-          description: "Metadata for the fileset"
-          required: true
-          schema:
-            $ref: "#/components/schemas/fileSet"
-      security:
-        - psuKey: []
-      responses:
-        204:
-          description: "Success"
-        default:
-          $ref: "#/components/responses/defaultPostError"
-  /filesets/{id}:
+  /works/{work_id}/filesets/{id}:
     get:
       tags: ["FileSet"]
       summary: "Displays a fileset"
       operationId: "showFileSet"
       parameters:
         - in: "path"
+          name: "work_id"
+          description: >-
+            Identifier of the work containing the file set
+          required: true
+          schema:
+            $ref: "#/components/schemas/id"
+        - in: "path"
           name: "id"
-          description: "Identifier of the fileset to be displayed"
+          description: >-
+            Identifier of the fileset
           required: true
           schema:
             $ref: "#/components/schemas/id"
@@ -329,7 +318,12 @@ paths:
         - psuKey: []
       responses:
         200:
-          description: "Success"
+          description: >-
+            Returns the file set and its associated metadata.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/fileSet"
         default:
           $ref: "#/components/responses/defaultGetError"
     put:
@@ -337,23 +331,45 @@ paths:
       summary: "Updates an existing fileset"
       operationId: "updateFileSet"
       parameters:
-        - in: "header"
-          name: "metadata"
-          description: "Metadata for the fileset"
-          required: true
-          schema:
-            $ref: "#/components/schemas/fileSet"
         - in: "path"
-          name: "id"
-          description: "Identifier of the fileset to be displayed"
+          name: "work_id"
+          description: >-
+            Identifier of the work containing the file set
           required: true
           schema:
             $ref: "#/components/schemas/id"
+        - in: "path"
+          name: "id"
+          description: >-
+            Identifier of the fileset
+          required: true
+          schema:
+            $ref: "#/components/schemas/id"
+      requestBody:
+        description: >-
+          Metadata with which to update the file set
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/updateFileSet"
+            examples:
+              update:
+                summary: "Updating the title of a file set"
+                description: >-
+                  Client posts updated metadata and changes are applied to the file set.
+                value:
+                  title: "New Updated Title"
       security:
         - psuKey: []
       responses:
-        204:
-          description: "Success"
+        200:
+          description: >-
+            The file set is successfully updated and the client recieves updated metadata.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/fileSet"
         default:
           $ref: "#/components/responses/defaultPutError"
     delete:
@@ -362,16 +378,24 @@ paths:
       operationId: "deleteFileSet"
       parameters:
         - in: "path"
+          name: "work_id"
+          description: >-
+            Identifier of the work containing the file set
+          required: true
+          schema:
+            $ref: "#/components/schemas/id"
+        - in: "path"
           name: "id"
-          description: "Identifier of the resource"
+          description: >-
+            Identifier of the fileset
           required: true
           schema:
             $ref: "#/components/schemas/id"
       security:
         - psuKey: []
       responses:
-        204:
-          description: "Success"
+        200:
+          $ref: "#/components/responses/defaultDeleteSuccess"
         default:
           $ref: "#/components/responses/defaultDeleteError"
   /files:
@@ -709,34 +733,34 @@ components:
                 format: "binary"
     fileSet:
       type: "object"
-      required:
-        - "member_of"
-        - "members"
-        - "depositor"
       properties:
         id:
           $ref: "#/components/schemas/id"
         title:
           type: "string"
           example: "Fileset in the Great Work"
-        member_of:
-          $ref: "#/components/schemas/work"
-        members:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/file"
+        original_filename:
+          type: "string"
+        date_uploaded:
+          type: "string"
+        date_modified:
+          type: "string"
+        audit_status:
+          type: "string"
+        characterization:
+          type: "string"
         depositor:
-          $ref: "#/components/schemas/agent"
-    newFileSet:
-      allOf:
-        - $ref: "#/components/schemas/fileSet"
-        - type: "object"
-          required:
-            - "file"
-          properties:
-            file:
-              type: "string"
-              format: "binary"
+          type: "string"
+    updateFileSet:
+      type: "object"
+      properties:
+        title:
+          type: "string"
+        restore_version:
+          $ref: "#/components/schemas/id"
+        new_version:
+          type: "string"
+          format: "binary"
     file:
       type: "object"
       required:
