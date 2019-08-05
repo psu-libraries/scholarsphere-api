@@ -78,7 +78,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/CreateWork"
+              $ref: "#/components/schemas/createWork"
             examples:
               minimal:
                 summary: "Work with only required metadata"
@@ -166,7 +166,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Work"
+                $ref: "#/components/schemas/work"
               examples:
                 work:
                   summary: "Newly created work"
@@ -204,7 +204,7 @@ paths:
           description: "Identifier of the resource"
           required: true
           schema:
-            $ref: "#/components/schemas/Id"
+            $ref: "#/components/schemas/id"
       security:
         - psuKey: []
       responses:
@@ -214,7 +214,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Work"
+                $ref: "#/components/schemas/work"
         default:
           $ref: "#/components/responses/defaultGetError"
     put:
@@ -227,14 +227,14 @@ paths:
           description: "Identifier of the resource"
           required: true
           schema:
-            $ref: "#/components/schemas/Id"
+            $ref: "#/components/schemas/id"
       requestBody:
         description: "Metadata with which to update the work"
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateWork"
+              $ref: "#/components/schemas/updateWork"
             examples:
               update:
                 summary: "Updating the title of a work"
@@ -251,7 +251,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Work"
+                $ref: "#/components/schemas/work"
               examples:
                 work:
                   summary: "Sample updated work"
@@ -286,7 +286,7 @@ paths:
           description: "Identifier of the resource"
           required: true
           schema:
-            $ref: "#/components/schemas/Id"
+            $ref: "#/components/schemas/id"
       security:
         - psuKey: []
       responses:
@@ -305,7 +305,7 @@ paths:
           description: "Metadata for the fileset"
           required: true
           schema:
-            $ref: "#/components/schemas/FileSet"
+            $ref: "#/components/schemas/fileSet"
       security:
         - psuKey: []
       responses:
@@ -324,7 +324,7 @@ paths:
           description: "Identifier of the fileset to be displayed"
           required: true
           schema:
-            $ref: "#/components/schemas/Id"
+            $ref: "#/components/schemas/id"
       security:
         - psuKey: []
       responses:
@@ -342,13 +342,13 @@ paths:
           description: "Metadata for the fileset"
           required: true
           schema:
-            $ref: "#/components/schemas/FileSet"
+            $ref: "#/components/schemas/fileSet"
         - in: "path"
           name: "id"
           description: "Identifier of the fileset to be displayed"
           required: true
           schema:
-            $ref: "#/components/schemas/Id"
+            $ref: "#/components/schemas/id"
       security:
         - psuKey: []
       responses:
@@ -366,7 +366,7 @@ paths:
           description: "Identifier of the resource"
           required: true
           schema:
-            $ref: "#/components/schemas/Id"
+            $ref: "#/components/schemas/id"
       security:
         - psuKey: []
       responses:
@@ -385,7 +385,7 @@ paths:
           description: "Metadata and binary content for the file"
           required: true
           schema:
-            $ref: "#/components/schemas/File"
+            $ref: "#/components/schemas/file"
       security:
         - psuKey: []
       responses:
@@ -404,7 +404,7 @@ paths:
           description: "Identifier of the file to be downloaded"
           required: true
           schema:
-            $ref: "#/components/schemas/Id"
+            $ref: "#/components/schemas/id"
       security:
         - psuKey: []
       responses:
@@ -422,13 +422,13 @@ paths:
           description: "Metadata and binary content for the file"
           required: true
           schema:
-            $ref: "#/components/schemas/File"
+            $ref: "#/components/schemas/file"
         - in: "path"
           name: "id"
           description: "Identifier of the file"
           required: true
           schema:
-            $ref: "#/components/schemas/Id"
+            $ref: "#/components/schemas/id"
       security:
         - psuKey: []
       responses:
@@ -446,7 +446,7 @@ paths:
           description: "Identifier of the resource"
           required: true
           schema:
-            $ref: "#/components/schemas/Id"
+            $ref: "#/components/schemas/id"
       security:
         - psuKey: []
       responses:
@@ -476,7 +476,7 @@ paths:
           description: "Metadata for the agent"
           required: true
           schema:
-            $ref: "#/components/schemas/Agent"
+            $ref: "#/components/schemas/agent"
       security:
         - psuKey: []
       responses:
@@ -495,7 +495,7 @@ paths:
           description: "Identifier of the agent to be displayed"
           required: true
           schema:
-            $ref: "#/components/schemas/Id"
+            $ref: "#/components/schemas/id"
       security:
         - psuKey: []
       responses:
@@ -513,13 +513,13 @@ paths:
           description: "Metadata for the agent"
           required: true
           schema:
-            $ref: "#/components/schemas/Agent"
+            $ref: "#/components/schemas/agent"
         - in: "path"
           name: "id"
           description: "Identifier of the agent"
           required: true
           schema:
-            $ref: "#/components/schemas/Id"
+            $ref: "#/components/schemas/id"
       security:
         - psuKey: []
       responses:
@@ -537,7 +537,7 @@ paths:
           description: "Identifier of the resource"
           required: true
           schema:
-            $ref: "#/components/schemas/Id"
+            $ref: "#/components/schemas/id"
       security:
         - psuKey: []
       responses:
@@ -549,12 +549,12 @@ paths:
 # Array of Schema Objects used to define the concepts/models (see https://swagger.io/specification/#schemaObject)
 components:
   schemas:
-    Id:
+    id:
       type: "object"
       properties:
         id:
           type: "string"
-    BasicMetadata:
+    basicMetadata:
       type: "object"
       required:
         - "title"
@@ -620,7 +620,7 @@ components:
         depositor:
           type: "string"
           example: "xyz123"
-    AdditionalMetadata:
+    additionalMetadata:
       type: "object"
       properties:
         contributor:
@@ -659,30 +659,30 @@ components:
           type: "array"
           items:
             type: "string"
-    Creator:
+    creator:
       type: "object"
       properties:
         creator:
           type: "array"
           items:
-            $ref: "#/components/schemas/Alias"
-    Work:
+            $ref: "#/components/schemas/alias"
+    work:
       allOf:
-        - $ref: "#/components/schemas/Id"
-        - $ref: "#/components/schemas/BasicMetadata"
-        - $ref: "#/components/schemas/AdditionalMetadata"
-        - $ref: "#/components/schemas/Creator"
+        - $ref: "#/components/schemas/id"
+        - $ref: "#/components/schemas/basicMetadata"
+        - $ref: "#/components/schemas/additionalMetadata"
+        - $ref: "#/components/schemas/creator"
         - type: "object"
           properties:
             member_ids:
               type: "array"
               items:
-                $ref: "#/components/schemas/Id"
-    CreateWork:
+                $ref: "#/components/schemas/id"
+    createWork:
       allOf:
-        - $ref: "#/components/schemas/BasicMetadata"
-        - $ref: "#/components/schemas/AdditionalMetadata"
-        - $ref: "#/components/schemas/Creator"
+        - $ref: "#/components/schemas/basicMetadata"
+        - $ref: "#/components/schemas/additionalMetadata"
+        - $ref: "#/components/schemas/creator"
         - type: "object"
           required:
             - "creator"
@@ -693,11 +693,11 @@ components:
               items:
                 type: "string"
                 format: "binary"
-    UpdateWork:
+    updateWork:
       allOf:
-        - $ref: "#/components/schemas/BasicMetadata"
-        - $ref: "#/components/schemas/AdditionalMetadata"
-        - $ref: "#/components/schemas/Creator"
+        - $ref: "#/components/schemas/basicMetadata"
+        - $ref: "#/components/schemas/additionalMetadata"
+        - $ref: "#/components/schemas/creator"
         - type: "object"
           required:
             - "creator"
@@ -707,7 +707,7 @@ components:
               items:
                 type: "string"
                 format: "binary"
-    FileSet:
+    fileSet:
       type: "object"
       required:
         - "member_of"
@@ -715,21 +715,21 @@ components:
         - "depositor"
       properties:
         id:
-          $ref: "#/components/schemas/Id"
+          $ref: "#/components/schemas/id"
         title:
           type: "string"
           example: "Fileset in the Great Work"
         member_of:
-          $ref: "#/components/schemas/Work"
+          $ref: "#/components/schemas/work"
         members:
           type: "array"
           items:
-            $ref: "#/components/schemas/File"
+            $ref: "#/components/schemas/file"
         depositor:
-          $ref: "#/components/schemas/Agent"
-    NewFileSet:
+          $ref: "#/components/schemas/agent"
+    newFileSet:
       allOf:
-        - $ref: "#/components/schemas/FileSet"
+        - $ref: "#/components/schemas/fileSet"
         - type: "object"
           required:
             - "file"
@@ -737,23 +737,23 @@ components:
             file:
               type: "string"
               format: "binary"
-    File:
+    file:
       type: "object"
       required:
         - "content"
       properties:
         id:
-          $ref: "#/components/schemas/Id"
+          $ref: "#/components/schemas/id"
         content:
           type: "string"
           format: "binary"
-    Agent:
+    agent:
       type: "object"
       required:
         - "surname"
       properties:
         id:
-          $ref: "#/components/schemas/Id"
+          $ref: "#/components/schemas/id"
         surname:
           type: "string"
           example: "Doe"
@@ -768,7 +768,7 @@ components:
           example: "jqd99"
         orcid_id:
           type: "string"
-    Alias:
+    alias:
       type: "object"
       required:
         - "display_name"
@@ -789,7 +789,7 @@ components:
           example: "jqd99"
         orcid_id:
           type: "string"
-    ServerStatus:
+    serverStatus:
       required:
         - code
         - message
@@ -813,7 +813,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ServerStatus"
+            $ref: "#/components/schemas/serverStatus"
           examples:
             clientError:
               $ref: "#/components/examples/clientError"
@@ -830,7 +830,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ServerStatus"
+            $ref: "#/components/schemas/serverStatus"
           examples:
             clientError:
               $ref: "#/components/examples/clientError"
@@ -847,7 +847,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ServerStatus"
+            $ref: "#/components/schemas/serverStatus"
           examples:
             clientError:
               $ref: "#/components/examples/clientError"
@@ -864,7 +864,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ServerStatus"
+            $ref: "#/components/schemas/serverStatus"
           examples:
             unauthorized:
               $ref: "#/components/examples/unauthorized"
@@ -878,7 +878,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ServerStatus"
+            $ref: "#/components/schemas/serverStatus"
           examples:
             success:
               summary: "The system successfully performed the operation"
