@@ -50,12 +50,6 @@ tags:
     externalDocs:
       description: "PCDM file"
       url: "http://pcdm.org/models#File"
-  - name: "Agent"
-    description: "Unique person or organization associated work."
-  - name: "Alias"
-    description: "An alternative name for an agent. There can be many alias for one agent."
-  - name: "Identifier"
-    description: "Alphanumeric string used as a unique identifier."
 
 # Paths Object, containing multiple Path Item Objects. Each path item will contain multiple Operation Objects.
 # See:
@@ -398,25 +392,6 @@ paths:
           $ref: "#/components/responses/defaultDeleteSuccess"
         default:
           $ref: "#/components/responses/defaultDeleteError"
-  /files:
-    post:
-      tags: ["File"]
-      summary: "Creates a new file"
-      operationId: "createFile"
-      parameters:
-        - in: "header"
-          name: "metadata"
-          description: "Metadata and binary content for the file"
-          required: true
-          schema:
-            $ref: "#/components/schemas/file"
-      security:
-        - psuKey: []
-      responses:
-        204:
-          description: "Success"
-        default:
-          $ref: "#/components/responses/defaultPostError"
   /files/{id}:
     get:
       tags: ["File"]
@@ -433,142 +408,15 @@ paths:
         - psuKey: []
       responses:
         200:
-          description: "Success"
+          description: >-
+            Returns the binary content for the file.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
         default:
           $ref: "#/components/responses/defaultGetError"
-    put:
-      tags: ["File"]
-      summary: "Updates an existing file with a new version"
-      operationId: "versionFile"
-      parameters:
-        - in: "header"
-          name: "metadata"
-          description: "Metadata and binary content for the file"
-          required: true
-          schema:
-            $ref: "#/components/schemas/file"
-        - in: "path"
-          name: "id"
-          description: "Identifier of the file"
-          required: true
-          schema:
-            $ref: "#/components/schemas/id"
-      security:
-        - psuKey: []
-      responses:
-        204:
-          description: "Success"
-        default:
-          $ref: "#/components/responses/defaultPutError"
-    delete:
-      tags: ["File"]
-      summary: "Deletes a file"
-      operationId: "deleteFile"
-      parameters:
-        - in: "path"
-          name: "id"
-          description: "Identifier of the resource"
-          required: true
-          schema:
-            $ref: "#/components/schemas/id"
-      security:
-        - psuKey: []
-      responses:
-        204:
-          description: "Success"
-        default:
-          $ref: "#/components/responses/defaultDeleteError"
-  /agents:
-    get:
-      tags: ["Agent"]
-      summary: "Displays all agents"
-      operationId: "listAgents"
-      security:
-        - psuKey: []
-      responses:
-        200:
-          description: "Successfully returned response"
-        default:
-          $ref: "#/components/responses/defaultGetError"
-    post:
-      tags: ["Agent"]
-      summary: "Creates a new agent"
-      operationId: "createAgent"
-      parameters:
-        - in: "header"
-          name: "metadata"
-          description: "Metadata for the agent"
-          required: true
-          schema:
-            $ref: "#/components/schemas/agent"
-      security:
-        - psuKey: []
-      responses:
-        204:
-          description: "Success"
-        default:
-          $ref: "#/components/responses/defaultPostError"
-  /agents/{id}:
-    get:
-      tags: ["Agent"]
-      summary: "Displays an agent"
-      operationId: "showAgent"
-      parameters:
-        - in: "path"
-          name: "id"
-          description: "Identifier of the agent to be displayed"
-          required: true
-          schema:
-            $ref: "#/components/schemas/id"
-      security:
-        - psuKey: []
-      responses:
-        200:
-          description: "Success"
-        default:
-          $ref: "#/components/responses/defaultGetError"
-    put:
-      tags: ["Agent"]
-      summary: "Updates an existing agent"
-      operationId: "updateAgent"
-      parameters:
-        - in: "header"
-          name: "metadata"
-          description: "Metadata for the agent"
-          required: true
-          schema:
-            $ref: "#/components/schemas/agent"
-        - in: "path"
-          name: "id"
-          description: "Identifier of the agent"
-          required: true
-          schema:
-            $ref: "#/components/schemas/id"
-      security:
-        - psuKey: []
-      responses:
-        204:
-          description: "Success"
-        default:
-          $ref: "#/components/responses/defaultPutError"
-    delete:
-      tags: ["Agent"]
-      summary: "Deletes an agent"
-      operationId: "deleteAgent"
-      parameters:
-        - in: "path"
-          name: "id"
-          description: "Identifier of the resource"
-          required: true
-          schema:
-            $ref: "#/components/schemas/id"
-      security:
-        - psuKey: []
-      responses:
-        204:
-          description: "Success"
-        default:
-          $ref: "#/components/responses/defaultDeleteError"
 
 # Array of Schema Objects used to define the concepts/models (see https://swagger.io/specification/#schemaObject)
 components:
@@ -751,6 +599,10 @@ components:
           type: "string"
         depositor:
           type: "string"
+        member_ids:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/id"
     updateFileSet:
       type: "object"
       properties:
@@ -761,44 +613,19 @@ components:
         new_version:
           type: "string"
           format: "binary"
-    file:
-      type: "object"
-      required:
-        - "content"
-      properties:
-        id:
-          $ref: "#/components/schemas/id"
-        content:
-          type: "string"
-          format: "binary"
-    agent:
-      type: "object"
-      required:
-        - "surname"
-      properties:
-        id:
-          $ref: "#/components/schemas/id"
-        surname:
-          type: "string"
-          example: "Doe"
-        given_name:
-          type: "string"
-          example: "John Quincy"
-        email:
-          type: "string"
-          example: "jqd99@psu.edu"
-        psu_id:
-          type: "string"
-          example: "jqd99"
-        orcid_id:
-          type: "string"
     alias:
-      type: "object"
+      allOf:
+        - $ref: "#/components/schemas/agent"
       required:
         - "display_name"
       properties:
         display_name:
           type: "string"
+    agent:
+      type: "object"
+      required:
+        - "surname"
+      properties:
         surname:
           type: "string"
           example: "Doe"
