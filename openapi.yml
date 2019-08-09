@@ -426,6 +426,7 @@ components:
       properties:
         id:
           type: "string"
+          example: "a0fc525b-0d49-48e0-a385-f86bd13bce4d"
     basicMetadata:
       type: "object"
       required:
@@ -438,15 +439,15 @@ components:
       properties:
         title:
           type: "string"
-          example: "My Great Work"
+          example: "Classifying Independent Hybridity"
         subtitle:
-          type: "array"
-          items:
-            type: "string"
+          type: "string"
+          example: "Quantum Optics and/in the Clan"
         keyword:
           type: "array"
           items:
             type: "string"
+          example: ["optitcs", "quantum physics", "fake paper names"]
         rights:
           type: "string"
           enum:
@@ -462,10 +463,20 @@ components:
             - "http://www.apache.org/licenses/LICENSE-2.0"
             - "https://www.gnu.org/licenses/gpl.html"
             - "https://opensource.org/licenses/MIT"
+          example: "https://creativecommons.org/licenses/by/4.0/"
         description:
           type: "array"
           items:
             type: "string"
+          example: >-
+            Anaesthesiology anthropology chaology craniology ecology endocrinology epileptology gnomonics ichthyology
+            linguistics mammalogy mazology nasology nematology neurobiology palaeontology psychopathology pterylology
+            textology toponymics. Aerostatics anemology avionics diplomatology euthenics geochemistry historiography
+            historiology hydrology hydrometeorology hygiastics iatromathematics lexigraphy martyrology metallogeny
+            neonatology numismatics oikology patrology pestology photobiology psychobiology psychology sphagnology
+            stemmatology threpsology ufology vinology. Arctophily astrophysics carcinology dactylology electrology
+            genealogy horography hydrobiology immunopathology lexigraphy molinology nidology paidonosology
+            palaeopedology venereology.
         resource_type:
           type: "string"
           enum:
@@ -489,6 +500,7 @@ components:
             - "Software or Program Code"
             - "Video"
             - "Other"
+          example: "Article"
         depositor:
           type: "string"
           example: "xyz123"
@@ -499,38 +511,47 @@ components:
           type: "array"
           items:
             type: "string"
+          example: ["Dr. Phyllis Abracadabra", "Harry L. Snethers"]
         publisher:
           type: "array"
           items:
             type: "string"
+          example: ["Dwindling Highpoint Publications"]
         published_date:
           type: "array"
           items:
             type: "string"
+          example: ["July 22, 2011"]
         subject:
           type: "array"
           items:
             type: "string"
+          example: ["Optics--Periodicals", "Hybridization"]
         language:
           type: "array"
           items:
             type: "string"
+          example: ["English"]
         identifier:
           type: "array"
           items:
             type: "string"
+          example: ["EX8889345"]
         based_near:
           type: "array"
           items:
             type: "string"
+          example: ["State College, Pennsylvania, United States"]
         related_url:
           type: "array"
           items:
             type: "string"
+          example: ["https://www.besttitlegenerator.com/index.php"]
         source:
           type: "array"
           items:
             type: "string"
+          example: ["Example source"]
     creator:
       type: "object"
       properties:
@@ -621,6 +642,7 @@ components:
       properties:
         display_name:
           type: "string"
+          example: "John Doe"
     agent:
       type: "object"
       required:
@@ -640,6 +662,7 @@ components:
           example: "jqd99"
         orcid_id:
           type: "string"
+          example: "0000-0003-5000-0001"
     serverStatus:
       required:
         - code
@@ -653,7 +676,9 @@ components:
   securitySchemes:
     psuKey:
       type: "apiKey"
-      description: "Example authorization mechanism to connect to the API. The implementation of generation and authorization will be resolved at a later date."
+      description: >-
+        Example authorization mechanism to connect to the API.
+        The implementation of generation and authorization will be resolved at a later date.
       name: "key"
       in: "header"
   responses:
